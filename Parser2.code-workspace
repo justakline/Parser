@@ -1,0 +1,13 @@
+{
+  "folders": [
+	{
+		"name": "Parser2",
+		"path": "."
+	}
+],
+  "settings": {
+    "FSharp.inlayHints.typeAnnotations": false,
+    "FSharp.inlayHints.parameterNames": false,
+    "FSharp.inlayHints.enabled": false
+  }
+}
