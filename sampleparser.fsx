@@ -155,7 +155,7 @@ let startParsing (str:string) =
 let promptAndGo () =
     (* TEST DATA *)
     // let userInput = "the fast , fast dog chases the fast cat ."
-    // let userInput = "the noun chases the adj cat and the adj , adj , fast dog adv chases the cat prep a adj noun ."
+    // let userInput = "the dog chases the fast cat and the adj , adj , fast dog adv chases the cat prep a adj dog ."
 
     let userInput =
         printf "Enter String: ";

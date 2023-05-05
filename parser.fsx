@@ -77,16 +77,21 @@ let rec parse (theList: Token list) = program theList
 //program ⟶ stmt_list
 and program lst = lst |> stmt_list
 
-// stmt_list ⟶ (stmt stmt_list) | ε
+// stmt_list ⟶ stmt     stmt_list | ε
 //  stmt ⟶ assignment | read_stmt | write_stmt | for_loop | if_stmt    // so need to use these tokens
+//Pipe to stmt then use the first of stmt_list, ie pattern match if it is a stmt, and if it is go to stmt_list else its empty
 and stmt_list =
     function
+    | xs ->
+        let result = xs |> stmt
 
-    | Id x :: xs -> Id x :: xs |> stmt |> stmt_list
-    | Read x :: xs -> Read x :: xs |> stmt |> stmt_list
-    | Write x :: xs -> Write x :: xs |> stmt |> stmt_list
-    | If x :: xs -> If x :: xs |> stmt |> stmt_list
-    | xs -> xs // Empty
+        result
+        |> (function
+        | Id x :: xs -> Id x :: xs |> stmt_list
+        | Read x :: xs -> Read x :: xs |> stmt_list
+        | Write x :: xs -> Write x :: xs |> stmt_list
+        | If x :: xs -> If x :: xs |> stmt_list
+        | xs -> xs) // Empty
 
 //  stmt ⟶ assignment | read_stmt | write_stmt | for_loop | if_stmt    // so need to use these tokens
 and stmt =
@@ -96,7 +101,7 @@ and stmt =
     | Write x :: xs -> Write x :: xs |> write_stmt
     | For x :: xs -> For x :: xs |> for_loop
     | If x :: xs -> If x :: xs |> if_stmt
-    | _ -> failwith "Unexpected end of input while processing stmt."
+    | _ -> failwith "Unexpected pattern input while processing stmt. Expected id, read, write, for, or if"
 
 // assignment ⟶ id := expr
 and assignment =
@@ -132,7 +137,7 @@ and factor =
         |> (function
         | Right_Par x :: xs -> xs
         | [] -> failwith "factor should have a right parenthesis"
-        | _ -> failwith "Unexpected pattern")
+        | _ -> failwith "Unexpected pattern in factor")
     | Id x :: xs -> xs
     | [] -> failwith "factor should not be empty"
     | _ -> failwith "Unexpected pattern in factor"
@@ -160,6 +165,8 @@ and read_stmt =
     function
     | Read x :: Id id :: xs -> xs
     | _ -> failwith "Unexpected pattern in read"
+
+
 
 // write_stmt ⟶ write expr
 and write_stmt =
@@ -199,7 +206,7 @@ and else_stmt =
 //Pattern match from for to step_stmt, pipe into a function to pattern match do, then pipe into stmt_list and pattern match done
 and for_loop =
     function
-    | For x :: Id id1 :: Equals equals :: Id id2 :: To t :: xs ->
+    | For x :: Id id1 :: Equals equals :: Id id2 :: To t :: Id id3 :: xs ->
         let r1 = xs |> step_stmt
 
         r1
@@ -217,7 +224,8 @@ and for_loop =
 and step_stmt =
     function
     | Step x :: Id id :: xs -> xs
-    | xs -> xs
+    | Step x :: xs -> failwith "Unexpected Pattern at Step, did not provide id"
+    | xs -> xs // empty
 
 
 
@@ -235,7 +243,9 @@ let startParsing (str: string) =
 
     // Work the magic...
     try
-        let parsedList = program tokenList in printfn $"The Final List:\n\t%A{parsedList}"
+        let parsedList = program tokenList in
+        printfn $"The Final List:\n\t%A{parsedList}\n"
+        printfn $"The Sentence: \n\t%A{str}\nfollows the grammar"
     with Failure msg ->
         printfn $"Error: %s{msg}"
         System.Console.ReadLine() |> ignore
@@ -252,7 +262,7 @@ let promptAndGo () =
     // let userInput = "the noun chases the adj cat and the adj , adj , fast dog adv chases the cat prep a adj noun ."
 
     let userInput =
-        printf "Enter String: "
+        printf "Enter a Program: "
         // A case where it's easier to use the .NET ReadLine as opposed to the more restrictive OCaml native variant.
         System.Console.ReadLine()
 
