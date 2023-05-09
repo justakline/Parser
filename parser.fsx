@@ -1,12 +1,3 @@
-(* Parser Sample *)
-
-(* NOTE: This example uses generic OCaml compatable syntax where the syntax where possible, which is
- * in most places!  There *are* LIBRARY differences between F# and OCaml that necessitate slighly
- * different functions to be used for input and output.
- *
- * If using OCaml instead of F#, check out: https://learnxinyminutes.com/docs/ocaml/
-*)
-
 
 // A sample grammar
 //
@@ -67,9 +58,7 @@ type Token =
         | x -> Id x
 
 
-// NOTES:
-// The |> operator sends (pipes) the output of one function directly to the next one in line.
-// "and" just allows multiple, mutually recursive functions to be defined under a single "let"
+
 
 
 let rec parse (theList: Token list) = program theList
@@ -271,8 +260,5 @@ let promptAndGo () =
     startParsing userInput
 
 
-// RUN INTERACTIVELY AS A SCRIPT
 promptAndGo ()
 
-// Uncomment the following to pause at the end if it's running in a terminal which dissapears upon running.
-// System.Console.ReadKey(true) |> ignore
